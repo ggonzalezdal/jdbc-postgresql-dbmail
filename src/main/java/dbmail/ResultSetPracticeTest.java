@@ -1,13 +1,14 @@
 package dbmail;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Properties;
 
-public class PreparedStatementTest {
+public class ResultSetPracticeTest {
 
 	public static void main(String[] args) {
 		
@@ -32,9 +33,9 @@ public class PreparedStatementTest {
 			String password = properties.getProperty("db.password");
 			
 			String sql = 
-						"SELECT user_name, name, surname, age " +
-						"FROM users " +
-						"WHERE user_name = ?";
+						"SELECT id, owner_name, balance " +
+						"FROM accounts";
+						
 			
 			try (
 				
@@ -46,41 +47,28 @@ public class PreparedStatementTest {
 				
 			) { 
 				
-				preparedStatement.setString(1, "morpheus");
-					
 				ResultSet resultSet =
 				        preparedStatement.executeQuery();
 				
 				while (resultSet.next()) {
 
-				    String userName =
-				            resultSet.getString("user_name");
+				    int id =
+				            resultSet.getInt(1);
 
-				    String name =
-				            resultSet.getString("name");
+				    String owner =
+				            resultSet.getString("owner_name");
 
-				    String surname =
-				            resultSet.getString("surname");
-				    
-				    int age = 
-				    	resultSet.getInt("age");
-				    
-				    String ageText;
-				    
-				    if (resultSet.wasNull()) {
-				    	
-				    	ageText = "NULL";
-				    	
-				    } else {
-				    	
-				    	ageText = String.valueOf(age);
-				    }
+				    BigDecimal balance =
+				            resultSet.getBigDecimal("balance");
 
-				    System.out.println(
-				    		 "Username: " + userName +
-				    	     " | Name: " + name +
-				    	     " | Surname: " + surname +
-				    	     " | Age: " + ageText
+					/*
+					 * System.out.println( id + " | " + owner + " | " + balance );
+					 */
+				    System.out.printf(
+				    		"%d | %s | %s%n",
+				    		id,
+				    		owner,
+				    		balance
 				    );
 				}
 			}
@@ -93,4 +81,5 @@ public class PreparedStatementTest {
 	}
 
 }
+
 

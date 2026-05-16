@@ -1,13 +1,14 @@
 package dbmail;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.Properties;
 
-public class PreparedStatementTest {
+public class JoinQueryTest {
 
 	public static void main(String[] args) {
 		
@@ -32,9 +33,14 @@ public class PreparedStatementTest {
 			String password = properties.getProperty("db.password");
 			
 			String sql = 
-						"SELECT user_name, name, surname, age " +
-						"FROM users " +
-						"WHERE user_name = ?";
+						"SELECT " +
+						"u.user_name AS username, " +
+						"u.name AS first_name, " +
+						"u.surname AS surname, " +
+						"a.balance AS account_balance " +
+						"FROM accounts a " +
+						"JOIN users u " +
+						"ON a.user_name = u.user_name";
 			
 			try (
 				
@@ -46,41 +52,28 @@ public class PreparedStatementTest {
 				
 			) { 
 				
-				preparedStatement.setString(1, "morpheus");
-					
 				ResultSet resultSet =
 				        preparedStatement.executeQuery();
 				
 				while (resultSet.next()) {
 
 				    String userName =
-				            resultSet.getString("user_name");
+				            resultSet.getString("username");
 
 				    String name =
-				            resultSet.getString("name");
+				            resultSet.getString("first_name");
 
 				    String surname =
 				            resultSet.getString("surname");
 				    
-				    int age = 
-				    	resultSet.getInt("age");
+				    BigDecimal balance = resultSet.getBigDecimal("account_balance");
 				    
-				    String ageText;
-				    
-				    if (resultSet.wasNull()) {
-				    	
-				    	ageText = "NULL";
-				    	
-				    } else {
-				    	
-				    	ageText = String.valueOf(age);
-				    }
 
 				    System.out.println(
 				    		 "Username: " + userName +
 				    	     " | Name: " + name +
 				    	     " | Surname: " + surname +
-				    	     " | Age: " + ageText
+				    	     " | Balance: " + balance
 				    );
 				}
 			}

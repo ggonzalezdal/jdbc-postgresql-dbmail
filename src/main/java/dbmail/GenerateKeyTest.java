@@ -1,13 +1,14 @@
 package dbmail;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.Properties;
 
-public class PreparedStatementTest {
+public class GenerateKeyTest {
 
 	public static void main(String[] args) {
 		
@@ -32,9 +33,10 @@ public class PreparedStatementTest {
 			String password = properties.getProperty("db.password");
 			
 			String sql = 
-						"SELECT user_name, name, surname, age " +
-						"FROM users " +
-						"WHERE user_name = ?";
+						"INSERT INTO accounts " +
+						"(balance, user_name) " +
+						"VALUES (?, ?) " +
+						"RETURNING id, balance, user_name, created_at";
 			
 			try (
 				
@@ -46,41 +48,36 @@ public class PreparedStatementTest {
 				
 			) { 
 				
-				preparedStatement.setString(1, "morpheus");
+				preparedStatement.setBigDecimal(1, new BigDecimal("3000"));
+				
+				preparedStatement.setString(2,  "trinity");
 					
 				ResultSet resultSet =
 				        preparedStatement.executeQuery();
 				
-				while (resultSet.next()) {
+				if (resultSet.next()) {
+					
+					int generatedId = resultSet.getInt("id");
+					
+					String userName =
+					        resultSet.getString("user_name");
 
-				    String userName =
-				            resultSet.getString("user_name");
+					BigDecimal balance =
+					        resultSet.getBigDecimal("balance");
 
-				    String name =
-				            resultSet.getString("name");
+					
+					java.sql.Timestamp createdAt =
+							resultSet.getTimestamp("created_at");
 
-				    String surname =
-				            resultSet.getString("surname");
-				    
-				    int age = 
-				    	resultSet.getInt("age");
-				    
-				    String ageText;
-				    
-				    if (resultSet.wasNull()) {
-				    	
-				    	ageText = "NULL";
-				    	
-				    } else {
-				    	
-				    	ageText = String.valueOf(age);
-				    }
-
-				    System.out.println(
-				    		 "Username: " + userName +
-				    	     " | Name: " + name +
-				    	     " | Surname: " + surname +
-				    	     " | Age: " + ageText
+					System.out.println(
+							"Generated account id: " +
+							        generatedId +
+							        " | User: " +
+							        userName +
+							        " | Balance: " +
+							        balance +
+							        " | Created at: " +
+							        createdAt
 				    );
 				}
 			}
@@ -93,4 +90,5 @@ public class PreparedStatementTest {
 	}
 
 }
+
 
