@@ -4,10 +4,11 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.Statement;
+//import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.Properties;
 
-public class ConnectionTest {
+public class PreparedStatementTest {
 
 	public static void main(String[] args) {
 		
@@ -31,48 +32,30 @@ public class ConnectionTest {
 			String user = properties.getProperty("db.user");
 			String password = properties.getProperty("db.password");
 			
+			String sql = 
+						"SELECT user_name, name, surname " +
+						"FROM users " +
+						"WHERE user_name = ?";
+			
 			try (
 				
 				Connection connection =
 						DriverManager.getConnection(url, user, password);
 					
-				Statement statement = 
-						connection.createStatement();
-				// ==================================================
-				// TEST 1 - PostgreSQL version
-				// ==================================================
-
-				/*	
-				ResultSet resultSet =
-						statement.executeQuery("SELECT version()");
-				*/	
 				
-				// ==================================================
-				// TEST 2 - Query users table
-				// ==================================================
 					
-				ResultSet resultSet =
-				        statement.executeQuery(
-				                //"SELECT user_name, name, surname FROM dbmail.users"
-				        		"SELECT user_name, name, surname FROM users"
-				        );
+				PreparedStatement preparedStatement = 
+						connection.prepareStatement(sql);
+				
+				
 			) { 
-				// ==================================================
-				// VERSION QUERY
-				// ==================================================
-
-				/*
-				if (resultSet.next()) {
-					
-					System.out.println("Connection successful!");
-                    System.out.println(resultSet.getString(1));
-				}
-				*/
 				
-				// ==================================================
-				// USERS QUERY
-				// ==================================================
-
+				preparedStatement.setString(1, "alice");
+					
+				ResultSet resultSet =
+				        preparedStatement.executeQuery();
+				
+				
 				while (resultSet.next()) {
 
 				    String userName =
@@ -100,3 +83,4 @@ public class ConnectionTest {
 	}
 
 }
+
