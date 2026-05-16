@@ -3,11 +3,10 @@ package dbmail;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.Properties;
 
-public class PreparedStatementTest {
+public class DeleteUserTest {
 
 	public static void main(String[] args) {
 		
@@ -32,8 +31,7 @@ public class PreparedStatementTest {
 			String password = properties.getProperty("db.password");
 			
 			String sql = 
-						"SELECT user_name, name, surname " +
-						"FROM users " +
+						"DELETE FROM users " +
 						"WHERE user_name = ?";
 			
 			try (
@@ -46,27 +44,16 @@ public class PreparedStatementTest {
 				
 			) { 
 				
-				preparedStatement.setString(1, "alice");
+				preparedStatement.setString(1, "maria");
 					
-				ResultSet resultSet =
-				        preparedStatement.executeQuery();
+				int rows =
+				        preparedStatement.executeUpdate();
 				
-				while (resultSet.next()) {
-
-				    String userName =
-				            resultSet.getString("user_name");
-
-				    String name =
-				            resultSet.getString("name");
-
-				    String surname =
-				            resultSet.getString("surname");
+				if (rows > 0) {
 
 				    System.out.println(
-				            userName + " | " +
-				            name + " | " +
-				            surname
-				    );
+				    		"Rows updated: " + rows);
+				           
 				}
 			}
 			
@@ -78,4 +65,5 @@ public class PreparedStatementTest {
 	}
 
 }
+
 
